@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>School Management System - Home</title>
+	<style>
+		body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-top: 50px;
+		}
+
+		h1 {
+			margin-bottom: 50px;
+		}
+
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-bottom: 50px;
+		}
+
+		input[type="text"] {
+			margin: 10px;
+			padding: 10px;
+			font-size: 18px;
+			border-radius: 5px;
+			border: none;
+		}
+
+		input[type="submit"] {
+			padding: 10px 20px;
+			font-size: 18px;
+			border-radius: 5px;
+			border: none;
+			background-color: #007bff;
+			color: #fff;
+			cursor: pointer;
+		}
+
+		ul {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			width: 50%;
+		}
+
+		li {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px;
+			border-bottom: 1px solid #ccc;
+		}
+
+		li:last-child {
+			border-bottom: none;
+		}
+
+		.logout-button {
+			margin-top: 50px;
+			background-color: #dc3545;
+			color: #fff;
+			padding: 10px 20px;
+			font-size: 18px;
+			border-radius: 5px;
+			border: none;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<h1>School Management System - Home</h1>
+
+	<form id="add-student-form">
+		<h2>Add New Student</h2>
+		<input type="text" id="student-name" placeholder="Name">
+		<input type="text" id="student-grade" placeholder="Grade">
+		<input type="submit" value="Add">
+	</form>
+
+	<h2>Student List</h2>
+	<ul id="student-list">
+	</ul>
+
+	<button class="logout-button" id="logout-button">Logout</button>
+
+	<script>
+		// Get the current username and role from local storage
+		const username = localStorage.getItem("username");
+		const role = localStorage.getItem("role");
+
+		// Check login status and redirect to login page if user is not logged in
+		const isLoggedIn = localStorage.getItem("isLoggedIn");
+		if (!isLoggedIn) {
+			window.location.href = "t1.html";
+		}
+
+		// Check login status and role to show/hide add student form
+		if (isLoggedIn && role === "teacher") {
+			document.getElementById("add-student-form").style.display = "block";
+		} else {
+			document.getElementById("add-student-form").style.display = "none";
+		}
+
+		// Logout button functionality
+		const logoutButton = document.getElementById("logout-button");
+		logoutButton.addEventListener("click", () => {
+			localStorage.removeItem("isLoggedIn");
+			localStorage.removeItem("username");
+			localStorage.removeItem("role");
+			window.location.href = "t1.html";
+		});
+
+		// Load existing student data from local storage
+		let students = localStorage.getItem("students");
+		if (!students) {
+		
+		students = [];
+	} else {
+		students = JSON.parse(students);
+	}
+
+	// Update the student list UI
+	const updateStudentList = () => {
+		const studentList = document.getElementById("student-list");
+		studentList.innerHTML = "";
+		students.forEach((student) => {
+			const li = document.createElement("li");
+			li.innerHTML = `
+				<span>${student.name}</span>
+				<span>${student.grade}</span>
+			`;
+			studentList.appendChild(li);
+		});
+	};
+	updateStudentList();
+
+	// Add student form functionality
+	const addStudentForm = document.getElementById("add-student-form");
+	addStudentForm.addEventListener("submit", (event) => {
+		event.preventDefault();
+		const studentNameInput = document.getElementById("student-name");
+		const studentGradeInput = document.getElementById("student-grade");
+		const studentName = studentNameInput.value;
+		const studentGrade = studentGradeInput.value;
+		if (studentName && studentGrade) {
+			const newStudent = {
+				name: studentName,
+				grade: studentGrade,
+			};
+			students.push(newStudent);
+			localStorage.setItem("students", JSON.stringify(students));
+			updateStudentList();
+			studentNameInput.value = "";
+			studentGradeInput.value = "";
+		}
+	});
+</script>
+</body>
+</html>
